@@ -1,0 +1,22 @@
+byte lDRpin=A0;
+int ldrVal = 0;
+
+void setup()
+{
+  Serial.begin(9600);
+  pinMode(lDRpin, INPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
+}
+
+void loop()
+{
+  ldrVal = analogRead(lDRpin);
+  Serial.println(ldrVal);
+  if(ldrVal>=600)
+  {
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(300); // Wait for 1000 millisecond(s)
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(300); // Wait for 1000 millisecond(s)
+  }
+}
