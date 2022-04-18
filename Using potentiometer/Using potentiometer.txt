@@ -1,0 +1,14 @@
+int brightness = 0,res;
+
+void setup()
+{
+  pinMode(9, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop()
+{
+  res=(analogRead(A0));
+  Serial.println(res);
+  analogWrite(9,res/4);
+}

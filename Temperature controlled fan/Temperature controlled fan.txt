@@ -1,0 +1,33 @@
+// Define the pins being used on the Arduino.
+#define TEMP_PIN 	A0
+#define FAN_PIN		 9
+
+// Macro to calculate Temperature based on thermistor resistance. 
+#define GET_TEMP()		((((analogRead(TEMP_PIN) * 5.0) / 1024.0) - 0.5) * 100);
+
+// Macro to set Fan Speed from 0% to 100%.
+#define FAN_SPEED(i)	analogWrite(FAN_PIN, map(i, 0, 100, 0, 255))
+
+// Store the temperature in this variable.
+int TempC = 0;
+
+
+void setup() { 
+	// Declare which pins are inputs and outputs.
+  	pinMode(TEMP_PIN, INPUT);
+	pinMode(FAN_PIN, OUTPUT);
+} 
+ 
+ 
+void loop() {
+  	// Get the current temperature.
+	TempC = GET_TEMP();
+  
+  	// Set boundaries for when the fan should turn on/off.
+	if (TempC <= 19) {			// Less than 19 C:
+		FAN_SPEED(0);			// Fan Fully Off.
+      
+    } else if (TempC >= 25) {	// Greater than 25 C:
+		FAN_SPEED(100);			// Fan Fully On.
+	}
+}
