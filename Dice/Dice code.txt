@@ -1,0 +1,150 @@
+byte currButtonState = HIGH, // the current reading from the input pin
+     prevButtonState = HIGH; // the previous reading from the input pin
+
+unsigned long debounceInterval = 25, // the debounce time; increase if the output flickers
+              lastDebounceTime =  0, // the last time the output pin was toggled
+              currDebounceTime =  0;
+
+const byte A =  2,
+           B =  3,
+           C =  4,
+           D =  5,
+           E =  6,
+           F =  7,
+           G =  8,
+          DP =  9,
+      btnPin = 10;
+
+// an array to save 7 segment display pin configuration of numbers
+           //row (auto -> 12)
+byte numArray[][8] = 
+               //column
+{ //A,B,C,D,E,F,G,DP
+  { 1,1,1,1,1,1,0,0 }, //[0]
+  { 0,1,1,0,0,0,0,0 }, //[1]
+  { 1,1,0,1,1,0,1,0 }, //[2]
+  { 1,1,1,1,0,0,1,0 }, //[3]
+  { 0,1,1,0,0,1,1,0 }, //[4]
+  { 1,0,1,1,0,1,1,0 }, //[5]
+  { 1,0,1,1,1,1,1,0 }, //[6]
+  { 1,1,1,0,0,0,0,0 }, //[7]
+  { 1,1,1,1,1,1,1,0 }, //[8]
+  { 1,1,1,1,0,1,1,0 }, //[9]
+    
+  { 0,0,0,0,0,0,0,1 }, //[.]    <=> 10
+  { 0,0,0,0,0,0,0,0 }, //[NULL] <=> 11 
+//{ 1,1,1,1,1,1,1,1 }, //[FULL] <=> 12 
+};//A,B,C,D,E,F,G,DP      
+
+/* function [ header | declaration | prototype | interface ] */
+void numWrite(byte);
+
+void setup()
+{
+  pinMode(btnPin, INPUT_PULLUP);
+  //digitalWrite(btnPin, HIGH);
+  
+  // define pin modes
+  for (byte currPin = 2; currPin <= 9; currPin++) 
+    pinMode(currPin, OUTPUT);
+  
+  // loop to turn leds od seven seg ON
+  for (byte currPin = A; currPin <= DP; currPin++) 
+  {
+    digitalWrite(currPin, HIGH);
+    delay(300);
+  }
+  // loop to turn leds od seven seg OFF
+  for (byte currPin = DP; currPin >= A; currPin--) 
+  {
+    digitalWrite(currPin, LOW);
+    delay(300);
+  }
+  
+  Serial.begin(9600);
+  
+  //counter loop
+  for (byte counter = 0; counter <= 11; counter++) 
+  {
+   numWrite(counter);
+   Serial.println(counter);
+   delay(100);
+  }
+  
+  for (int counter = 11; counter >= 0; counter--) 
+  {
+   numWrite(counter); 
+   Serial.println(counter);
+   delay(100);
+  }
+  
+  //WARNING if counter type is byte!
+  /*
+  for (byte counter = 12; counter > 0; counter--) 
+  {
+   numWrite(random(1, 7)); 
+   Serial.println(random(1, 7));
+   delay(500);
+  }
+  */
+  numWrite(11);
+}
+
+void loop() 
+{ 
+  // read the state of the switch into a local variable:
+  int reading = digitalRead(btnPin);
+  
+  currDebounceTime = millis();
+
+  // check to see if you just pressed the button
+  // (i.e. the input went from LOW to HIGH),  and you've waited
+  // long enough since the last press to ignore any noise:
+
+  // If the switch changed, due to noise or pressing:
+  if (reading != prevButtonState) 
+  { // reset the debouncing timer
+    //lastDebounceTime = millis();
+    lastDebounceTime = millis();
+  }
+
+  if ((currDebounceTime - lastDebounceTime) >= debounceInterval) 
+  {
+    // whatever the reading is at, it's been there for longer
+    // than the debounce delay, so take it as the actual current state:
+
+    // if the button state has changed:
+    if (reading != currButtonState) 
+    {
+      currButtonState = reading;
+      // only toggle the LED if the new button state is LOW
+      if (currButtonState == LOW) 
+      {
+        randomSeed(analogRead(A0));
+        numWrite(10);
+      }
+      else
+      {
+        //int currRolledDice = random(1,6);
+        numWrite(random(1,6));
+      }
+    }
+  }
+
+  // save the reading.  Next time through the loop,
+  // it'll be the lastButtonState:
+  prevButtonState = reading;
+}
+
+/* function [ definition | implementation ] */
+// this functions writes values to the 7 segment display pins  
+void numWrite(byte number) 
+{
+  int currPin = 2; // from D2 -> [A]
+  
+  for (byte j = 0; j < 8; j++) 
+  {                               //row
+   digitalWrite(currPin, numArray[number][j]);
+   currPin++;     // to D9 -> [DP]       //column
+  }
+}

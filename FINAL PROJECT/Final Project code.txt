@@ -1,0 +1,90 @@
+/*============================================================================
+ | 
+ | Project name:				Temperature shown on 16x2 LCD display
+ | 
+ +----------------------------------------------------------------------------
+ | 
+ | Description: This project shows the measured temperature on 16x2 LCD display. 
+ |              
+ | 
+ | Input:       The project requires an analog temperature sensor for input.
+ | 
+ | Output:      It shows on the display the temperature we measured and sends data via the UART.
+ | 
+ | The Circuit: This project is based on Arduino UNO Revision 3 as a main device or unit - the microcontroller board.
+ |    
+ |    * LCD 16x2 display
+ |    * 2x Resistor(220Ω and 100Ω) 
+ |    * Temperature Sensor
+ |    * Potentiometer
+ |
+ |    * LCD RS pin to digital pin 12
+ |    * LCD Enable pin to digital pin 11
+ |    * LCD D4 pin to digital pin 5
+ |    * LCD D5 pin to digital pin 4
+ |    * LCD D6 pin to digital pin 3
+ |    * LCD D7 pin to digital pin 2
+ |    * LCD R/W pin to ground
+ |    * LCD VSS pin to ground
+ |    * LCD VCC pin to 5V
+ |    
+ |
+ | Main Aim:    For educational purposes at Technical University of Sofia.
+ | 
+ | Algorithm:   The code is implemented in Arduino programming language (APL).
+ |              The readings of the analog sensor are converted solely into 
+ |              degrees Celsius. 16x2 LCD display shows the temperature from the sensor.
+ |              The ADC output is sent via the UART.   
+ | 
+ | Required 
+ | Features Not 
+ | Included:    This project has N outputs states - depending on the N times we change temperature from the sensor,
+ |              the display shows N different temperatures.
+ |              
+ | 
+ | Known Bugs:  The complexity of the project is relatively low. 
+ |              I have found a bug. The formula in code which I use for the temperature is
+ |              approximate and sometimes it give us a deviation +1°C!
+ | 
+ +---------------------------------------------------------------------------
+ | 
+ | Author:      Valentin Popov
+ | Group:       46 KSI
+ | Faculty #:   121221026
+ | 
+ | Discipline:  PracticumLab2022 (Practicum - Laboratory Exercises, year 2022)
+ | Institution: Technical University of Sofia
+ | Instructor:  A.Redzheb (adnan@tu-sofia.bg)
+ | Platform:    TinkerCAD Circuits
+ | Hyperlink:   https://www.tinkercad.com/things/gZFcOmITcX4
+ | Due Date:    20 May 2022 (Absolute Deadline)
+ |  
+ *==========================================================================*/
+
+
+
+// include the library code:
+#include <LiquidCrystal.h>
+
+// initialize the library with the numbers of the interface pins
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+void setup() {
+  lcd.begin(16, 2);
+}
+
+void loop() {
+  int temp = analogRead(A0);
+   temp = temp * 0.49150550-50; 
+    lcd.setCursor(0, 0);
+  lcd.print("Temp:");
+    lcd.setCursor(5, 0);
+  lcd.print(temp);
+    lcd.setCursor(8, 0);
+  lcd.print("C");
+  lcd.setCursor(5, 0);
+  delay(1000);
+  lcd.print("   ");
+  
+}
+ 

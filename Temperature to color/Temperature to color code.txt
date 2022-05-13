@@ -1,0 +1,1465 @@
+/* Declaring global variables and constants */
+//Input
+const byte tempSenPin     =  A3; //Pin# A3 <=> D17
+  unsigned tempSenVal     =   0, //For storing sensor readings
+           tempSenValMin  =  20,
+           tempSenValMax  = 358;
+    signed tempInCelsius  =   0, //For storing temperature values in degrees Celsius
+           tempInCelsMin  = -40,
+           tempInCelsMax  = 125;
+//Output
+const byte rgbLedRedPin   =   8,
+           rgbLedGreenPin =  12,
+           rgbLedBluePin  =  13;
+
+String  red = "red",            //For convenience (while giving arguments & printing)
+      green = "green",
+       blue = "blue", 
+       cyan = "cyan", 
+     purple = "purple", 
+     yellow = "yellow", 
+      white = "white", 
+        off = "off", 
+        all = "all";
+
+/* Setting & testing */
+void setup()
+{
+  //Analog INPUT
+  pinMode(tempSenPin, INPUT);
+  //Digital OUTPUT
+  pinMode(rgbLedRedPin,   OUTPUT);
+  pinMode(rgbLedGreenPin, OUTPUT);
+  pinMode(rgbLedBluePin,  OUTPUT);
+
+  //Configuring the UART with baud rate of 115200 bits per second
+  Serial.begin(115200);
+
+  //Initial color test
+  Serial.println("\nTesting all 7 colors (8 states):");
+  rgbLed7Colors(1000);
+}
+
+/* The infinite loop */
+void loop()
+{
+  //Storing the value from the ADC reading
+  tempSenVal = analogRead(tempSenPin);
+  //Mapping the stored number to temperatures in degrees Celsius
+  tempInCelsius = map(tempSenVal + 1, tempSenValMin, tempSenValMax, tempInCelsMin, tempInCelsMax);
+  
+  //Conditional algorithm ver 0.1 (using if statement)
+  /*
+  if(temperature >= -40 && temperature <=  17)
+  {
+    //Blue
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,  HIGH);
+  }
+  if(temperature >=  18 && temperature <=  28)
+  {
+    //Green
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,   LOW);
+  }
+  if(temperature >=  29 && temperature <= 125)
+  {
+    //Red
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+  }
+  if(temperature <=-41 && temperature >= 126)
+  {
+    //Off
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+  }
+  */
+  
+  //Conditional algorithm ver 1.0 (using if-else statement)
+  /*
+  if(tempInCelsius >= -40 && tempInCelsius <=  17)
+  {
+    //Blue
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,  HIGH);
+  }
+  else if(tempInCelsius >=  18 && tempInCelsius <=  28)
+  {
+    //Green
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,   LOW);
+  }
+  else if(tempInCelsius >=  29 && tempInCelsius <= 125)
+  {
+    //Red
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+  }
+  else
+  {
+    //Off
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+  }
+  */
+  
+  //Conditional algorithm ver 1.1 (calling custom functions)
+  /*   if(tempInCelsius >= -40 && tempInCelsius <=  17) rgbLedBlue(); 
+  else if(tempInCelsius >=  18 && tempInCelsius <=  28) rgbLedGreen();
+  else if(tempInCelsius >=  29 && tempInCelsius <= 125) rgbLedRed();
+  else rgbLedOff();
+  */
+  
+  //Conditional algorithm ver 2.0 (using switch - case)
+  /*
+  switch ((tempInCelsius >= 17) - (tempInCelsius <= 28))
+  {
+    case -1 :
+      rgbLedBlue();
+      break;
+    case  1 :
+      rgbLedRed();
+      break;
+    case  0 : //or "default :"
+      rgbLedGreen();
+      break;
+  }
+  */
+  
+  //Conditional algorithm ver 3.0 (additional colors & switched back to 
+  //                           if-else statement /+ 4 custom functions/)
+  /*
+       if(tempInCelsius >= -40 && tempInCelsius <=  -7) rgbLedWhite();
+  else if(tempInCelsius >=  -6 && tempInCelsius <=   6) rgbLedBlue();
+  else if(tempInCelsius >=   7 && tempInCelsius <=  17) rgbLedCyan();
+  else if(tempInCelsius >=  18 && tempInCelsius <=  28) rgbLedGreen();
+  else if(tempInCelsius >=  29 && tempInCelsius <=  39) rgbLedYellow();
+  else if(tempInCelsius >=  40 && tempInCelsius <=  50) rgbLedPurple();
+  else if(tempInCelsius >=  51 && tempInCelsius <= 125) rgbLedRed();
+  else                                                  rgbLedOff();
+  */
+  
+  //Conditional algorithm ver 3.1 (added blinking /+ 9 custom functions/)
+  /*   
+       if(tempInCelsius >= -40 && tempInCelsius <= -29) rgbLedWhiteBlinkX02();
+  else if(tempInCelsius >= -28 && tempInCelsius <= -18) rgbLedWhiteBlinkX01();
+  else if(tempInCelsius >= -17 && tempInCelsius <=  -7) rgbLedWhite();
+  else if(tempInCelsius >=  -6 && tempInCelsius <=   6) rgbLedBlue();
+  else if(tempInCelsius >=   7 && tempInCelsius <=  17) rgbLedCyan();
+  else if(tempInCelsius >=  18 && tempInCelsius <=  28) rgbLedGreen();
+  else if(tempInCelsius >=  29 && tempInCelsius <=  39) rgbLedYellow();
+  else if(tempInCelsius >=  40 && tempInCelsius <=  50) rgbLedPurple();
+  else if(tempInCelsius >=  51 && tempInCelsius <=  61) rgbLedRed();
+  else if(tempInCelsius >=  62 && tempInCelsius <=  72) rgbLedRedBlinkX01();
+  else if(tempInCelsius >=  73 && tempInCelsius <=  83) rgbLedRedBlinkX02();
+  else if(tempInCelsius >=  84 && tempInCelsius <=  94) rgbLedRedBlinkX04();
+  else if(tempInCelsius >=  95 && tempInCelsius <= 105) rgbLedRedBlinkX08();
+  else if(tempInCelsius >= 106 && tempInCelsius <= 116) rgbLedRedBlinkX16();
+  else if(tempInCelsius >= 117 && tempInCelsius <= 125) rgbLedRedBlinkX32();
+  else                                                  rgbLed7Colors(100);
+  */
+  
+  //Conditional algorithm ver 3.2 (reducing the # of custom functions /- 6/)
+  /*   
+       if(tempInCelsius >= -40 && tempInCelsius <= -29) rgbLedWhiteBlink( 500);
+  else if(tempInCelsius >= -28 && tempInCelsius <= -18) rgbLedWhiteBlink(1000);
+  else if(tempInCelsius >= -17 && tempInCelsius <=  -7) rgbLedWhite();
+  else if(tempInCelsius >=  -6 && tempInCelsius <=   6) rgbLedBlue();
+  else if(tempInCelsius >=   7 && tempInCelsius <=  17) rgbLedCyan();
+  else if(tempInCelsius >=  18 && tempInCelsius <=  28) rgbLedGreen();
+  else if(tempInCelsius >=  29 && tempInCelsius <=  39) rgbLedYellow();
+  else if(tempInCelsius >=  40 && tempInCelsius <=  50) rgbLedPurple();
+  else if(tempInCelsius >=  51 && tempInCelsius <=  61) rgbLedRed();
+  else if(tempInCelsius >=  62 && tempInCelsius <=  72) rgbLedRedBlink(1000);
+  else if(tempInCelsius >=  73 && tempInCelsius <=  83) rgbLedRedBlink( 500);
+  else if(tempInCelsius >=  84 && tempInCelsius <=  94) rgbLedRedBlink( 250);
+  else if(tempInCelsius >=  95 && tempInCelsius <= 105) rgbLedRedBlink( 125);
+  else if(tempInCelsius >= 106 && tempInCelsius <= 116) rgbLedRedBlink(  63);
+  else if(tempInCelsius >= 117 && tempInCelsius <= 125) rgbLedRedBlink(  32);
+  else                                                  rgbLed7Colors(  100);
+  */
+
+  //Conditional algorithm ver 3.3 (further reduction the # of custom functions /- 2/)
+  /*     
+       if(tempInCelsius >= -40 && tempInCelsius <= -29) rgbLedWhiteAndBlink( 500);
+  else if(tempInCelsius >= -28 && tempInCelsius <= -18) rgbLedWhiteAndBlink(1000);
+  else if(tempInCelsius >= -17 && tempInCelsius <=  -7) rgbLedWhiteAndBlink(   0);
+  else if(tempInCelsius >=  -6 && tempInCelsius <=   6) rgbLedBlueAndBlink(    0);
+  else if(tempInCelsius >=   7 && tempInCelsius <=  17) rgbLedCyanAndBlink(    0);
+  else if(tempInCelsius >=  18 && tempInCelsius <=  28) rgbLedGreenAndBlink(   0);
+  else if(tempInCelsius >=  29 && tempInCelsius <=  39) rgbLedYellowAndBlink(  0);
+  else if(tempInCelsius >=  40 && tempInCelsius <=  50) rgbLedPurpleAndBlink(  0);
+  else if(tempInCelsius >=  51 && tempInCelsius <=  61) rgbLedRedAndBlink(     0);
+  else if(tempInCelsius >=  62 && tempInCelsius <=  72) rgbLedRedAndBlink(  1000);
+  else if(tempInCelsius >=  73 && tempInCelsius <=  83) rgbLedRedAndBlink(   500);
+  else if(tempInCelsius >=  84 && tempInCelsius <=  94) rgbLedRedAndBlink(   250);
+  else if(tempInCelsius >=  95 && tempInCelsius <= 105) rgbLedRedAndBlink(   125);
+  else if(tempInCelsius >= 106 && tempInCelsius <= 116) rgbLedRedAndBlink(    63);
+  else if(tempInCelsius >= 117 && tempInCelsius <= 125) rgbLedRedAndBlink(    32);
+  else                                                  rgbLed7Colors(       100);
+  */
+
+  //Conditional algorithm ver 4.0 (radically reducing the number of custom/user functions -
+  //    calling only one giving a symbol as an argument for setting the appropriate color)
+  /*
+       if(tempInCelsius >= -40 && tempInCelsius <= -29) rgbLedClrBlnk('W',  500);
+  else if(tempInCelsius >= -28 && tempInCelsius <= -18) rgbLedClrBlnk('W', 1000);
+  else if(tempInCelsius >= -17 && tempInCelsius <=  -7) rgbLedClrBlnk('W',    0);
+  else if(tempInCelsius >=  -6 && tempInCelsius <=   6) rgbLedClrBlnk('B',    0);
+  else if(tempInCelsius >=   7 && tempInCelsius <=  17) rgbLedClrBlnk('C',    0);
+  else if(tempInCelsius >=  18 && tempInCelsius <=  28) rgbLedClrBlnk('G',    0);
+  else if(tempInCelsius >=  29 && tempInCelsius <=  39) rgbLedClrBlnk('Y',    0);
+  else if(tempInCelsius >=  40 && tempInCelsius <=  50) rgbLedClrBlnk('P',    0);
+  else if(tempInCelsius >=  51 && tempInCelsius <=  61) rgbLedClrBlnk('R',    0);
+  else if(tempInCelsius >=  62 && tempInCelsius <=  72) rgbLedClrBlnk('R', 1000);
+  else if(tempInCelsius >=  73 && tempInCelsius <=  83) rgbLedClrBlnk('R',  500);
+  else if(tempInCelsius >=  84 && tempInCelsius <=  94) rgbLedClrBlnk('R',  250);
+  else if(tempInCelsius >=  95 && tempInCelsius <= 105) rgbLedClrBlnk('R',  125);
+  else if(tempInCelsius >= 106 && tempInCelsius <= 116) rgbLedClrBlnk('R',   63);
+  else if(tempInCelsius >= 117 && tempInCelsius <= 125) rgbLedClrBlnk('R',   32);
+  else                                                  rgbLedClrBlnk('A',  100);
+  */
+  
+  //Conditional algorithm ver 5.0 (added printing the current color to the serial monitor)
+  /*
+       if(tempInCelsius >= -40 && tempInCelsius <= -29) rgbLedClrBlnkSrl('W',  500);
+  else if(tempInCelsius >= -28 && tempInCelsius <= -18) rgbLedClrBlnkSrl('W', 1000);
+  else if(tempInCelsius >= -17 && tempInCelsius <=  -7) rgbLedClrBlnkSrl('W',    0);
+  else if(tempInCelsius >=  -6 && tempInCelsius <=   6) rgbLedClrBlnkSrl('B',    0);
+  else if(tempInCelsius >=   7 && tempInCelsius <=  17) rgbLedClrBlnkSrl('C',    0);
+  else if(tempInCelsius >=  18 && tempInCelsius <=  28) rgbLedClrBlnkSrl('G',    0);
+  else if(tempInCelsius >=  29 && tempInCelsius <=  39) rgbLedClrBlnkSrl('Y',    0);
+  else if(tempInCelsius >=  40 && tempInCelsius <=  50) rgbLedClrBlnkSrl('P',    0);
+  else if(tempInCelsius >=  51 && tempInCelsius <=  61) rgbLedClrBlnkSrl('R',    0);
+  else if(tempInCelsius >=  62 && tempInCelsius <=  72) rgbLedClrBlnkSrl('R', 1000);
+  else if(tempInCelsius >=  73 && tempInCelsius <=  83) rgbLedClrBlnkSrl('R',  500);
+  else if(tempInCelsius >=  84 && tempInCelsius <=  94) rgbLedClrBlnkSrl('R',  250);
+  else if(tempInCelsius >=  95 && tempInCelsius <= 105) rgbLedClrBlnkSrl('R',  125);
+  else if(tempInCelsius >= 106 && tempInCelsius <= 116) rgbLedClrBlnkSrl('R',   63);
+  else if(tempInCelsius >= 117 && tempInCelsius <= 125) rgbLedClrBlnkSrl('R',   32);
+  else                                                  rgbLedClrBlnkSrl('A',  100);
+  */
+  
+  //Conditional algorithm ver 5.1 (using multiple custom functions and giving a pre-declared 
+  //                 variable type String as an argument for setting and printing the color)
+  
+       if(tempInCelsius >= -40 && tempInCelsius <= -29) rgbLedColorBlinkSerial(white,  500);
+  else if(tempInCelsius >= -28 && tempInCelsius <= -18) rgbLedColorBlinkSerial(white, 1000);
+  else if(tempInCelsius >= -17 && tempInCelsius <=  -7) rgbLedColorBlinkSerial(white,    0);
+  else if(tempInCelsius >=  -6 && tempInCelsius <=   6) rgbLedColorBlinkSerial(blue,     0);
+  else if(tempInCelsius >=   7 && tempInCelsius <=  17) rgbLedColorBlinkSerial(cyan,     0);
+  else if(tempInCelsius >=  18 && tempInCelsius <=  28) rgbLedColorBlinkSerial(green,    0);
+  else if(tempInCelsius >=  29 && tempInCelsius <=  39) rgbLedColorBlinkSerial(yellow,   0);
+  else if(tempInCelsius >=  40 && tempInCelsius <=  50) rgbLedColorBlinkSerial(purple,   0);
+  else if(tempInCelsius >=  51 && tempInCelsius <=  61) rgbLedColorBlinkSerial(red,      0);
+  else if(tempInCelsius >=  62 && tempInCelsius <=  72) rgbLedColorBlinkSerial(red,   1000);
+  else if(tempInCelsius >=  73 && tempInCelsius <=  83) rgbLedColorBlinkSerial(red,    500);
+  else if(tempInCelsius >=  84 && tempInCelsius <=  94) rgbLedColorBlinkSerial(red,    250);
+  else if(tempInCelsius >=  95 && tempInCelsius <= 105) rgbLedColorBlinkSerial(red,    125);
+  else if(tempInCelsius >= 106 && tempInCelsius <= 116) rgbLedColorBlinkSerial(red,     63);
+  else if(tempInCelsius >= 117 && tempInCelsius <= 125) rgbLedColorBlinkSerial(red,     32);
+  else                                                  rgbLedColorBlinkSerial(all,    100);
+    
+  
+  //Conditional algorithm ver 6.0 (switching back to multiple user functions but 
+  //                   without additional if-else statements and serial printing)
+  /*
+       if(tempInCelsius >= -40 && tempInCelsius <= -29) rgbLedWhiteBlink( 500);
+  else if(tempInCelsius >= -28 && tempInCelsius <= -18) rgbLedWhiteBlink(1000);
+  else if(tempInCelsius >= -17 && tempInCelsius <=  -7) rgbLedWhite();
+  else if(tempInCelsius >=  -6 && tempInCelsius <=   6) rgbLedBlue();
+  else if(tempInCelsius >=   7 && tempInCelsius <=  17) rgbLedCyan();
+  else if(tempInCelsius >=  18 && tempInCelsius <=  28) rgbLedGreen();
+  else if(tempInCelsius >=  29 && tempInCelsius <=  39) rgbLedYellow();
+  else if(tempInCelsius >=  40 && tempInCelsius <=  50) rgbLedPurple();
+  else if(tempInCelsius >=  51 && tempInCelsius <=  61) rgbLedRed();
+  else if(tempInCelsius >=  62 && tempInCelsius <=  72) rgbLedRedBlink(1000);
+  else if(tempInCelsius >=  73 && tempInCelsius <=  83) rgbLedRedBlink( 500);
+  else if(tempInCelsius >=  84 && tempInCelsius <=  94) rgbLedRedBlink( 250);
+  else if(tempInCelsius >=  95 && tempInCelsius <= 105) rgbLedRedBlink( 125);
+  else if(tempInCelsius >= 106 && tempInCelsius <= 116) rgbLedRedBlink(  63);
+  else if(tempInCelsius >= 117 && tempInCelsius <= 125) rgbLedRedBlink(  32);
+  else                                                  rgbLed7Colors(  100);
+  */
+  
+  //Conditional algorithm ver 6.1 (add back serial printing as in version 1.5.1)
+  /*
+   * { YOUR CODE HERE } 
+   */
+    
+  //Accelerating simulation time
+  delay(100);
+  }
+
+/* Function definitions */
+
+//Serial printing
+void printToSerial(String color)
+{
+  Serial.print("Sensor reading: ");
+  Serial.print(tempSenVal);
+  Serial.print(" | Temperature: ");
+  Serial.print(tempInCelsius);
+  Serial.print("\xB0\C");
+  Serial.print(" | LED color: ");
+  Serial.println(color);
+}
+
+//Red
+void rgbLedRed()
+{
+  digitalWrite(rgbLedRedPin,   HIGH);
+  digitalWrite(rgbLedGreenPin,  LOW);
+  digitalWrite(rgbLedBluePin,   LOW);
+}
+//Blinking in red
+void rgbLedRedBlink(unsigned millis)
+{ 
+  //ON
+  rgbLedRed();
+  //Halt for given milliseconds
+  delay(millis);
+  //OFF
+  rgbLedOff();
+  //Halt for given milliseconds
+  delay(millis);
+}
+//Red and blinking in red
+void rgbLedRedAndBlink(unsigned millis)
+{ 
+  //ON
+  rgbLedRed();
+  //Blinking
+  if(millis > 0)
+  { //Halt for given milliseconds
+    delay(millis);
+    //OFF
+    rgbLedOff();
+    //Halt for given milliseconds
+    delay(millis);
+  }
+}
+//Blinking in red x1
+void rgbLedRedBlinkX01()
+{ 
+  //ON
+  rgbLedRed();
+  //Halt for 1000 milliseconds
+  delay(1000);
+  //OFF
+  rgbLedOff();
+  //Halt for 1000 milliseconds
+  delay(1000);
+}
+//Blinking in red x2
+void rgbLedRedBlinkX02()
+{ 
+  //ON
+  rgbLedRed();
+  //Halt for 500 milliseconds
+  delay(500);
+  //OFF
+  rgbLedOff();
+  //Halt for 500 milliseconds
+  delay(500);
+}
+//Blinking in red x4
+void rgbLedRedBlinkX04()
+{ 
+  //ON
+  rgbLedRed();
+  //Halt for 500 milliseconds
+  delay(250);
+  //OFF
+  rgbLedOff();
+  //Halt for 500 milliseconds
+  delay(250);
+}
+//Blinking in red x8
+void rgbLedRedBlinkX08()
+{ 
+  //ON
+  rgbLedRed();
+  //Halt for 500 milliseconds
+  delay(125);
+  //OFF
+  rgbLedOff();
+  //Halt for 500 milliseconds
+  delay(125);
+}
+//Blinking in red x16
+void rgbLedRedBlinkX16()
+{ 
+  //ON
+  rgbLedRed();
+  //Halt for 500 milliseconds
+  delay(63);
+  //OFF
+  rgbLedOff();
+  //Halt for 500 milliseconds
+  delay(63);
+}
+//Blinking in red x32
+void rgbLedRedBlinkX32()
+{ 
+  //ON
+  rgbLedRed();
+  //Halt for 500 milliseconds
+  delay(32);
+  //OFF
+  rgbLedOff();
+  //Halt for 500 milliseconds
+  delay(32);
+}
+
+//Green
+void rgbLedGreen()
+{
+  digitalWrite(rgbLedRedPin,    LOW);
+  digitalWrite(rgbLedGreenPin, HIGH);
+  digitalWrite(rgbLedBluePin,   LOW);
+}
+//Blinking in green
+void rgbLedGreenBlink(unsigned millis)
+{ 
+  //ON
+  rgbLedGreen();
+  //Halt for given milliseconds
+  delay(millis);
+  //OFF
+  rgbLedOff();
+  //Halt for given milliseconds
+  delay(millis);
+}
+//Green and blinking in green
+void rgbLedGreenAndBlink(unsigned millis)
+{ 
+  (millis == 0) ? rgbLedGreen() : rgbLedGreenBlink(millis);
+}
+
+//Blue
+void rgbLedBlue()
+{
+  digitalWrite(rgbLedRedPin,    LOW);
+  digitalWrite(rgbLedGreenPin,  LOW);
+  digitalWrite(rgbLedBluePin,  HIGH);
+}
+//Blinking in blue
+void rgbLedBlueBlink(unsigned millis)
+{
+  //ON
+  rgbLedBlue();
+  //Halt for given milliseconds
+  delay(millis);
+  //OFF
+  rgbLedOff();
+  //Halt for given milliseconds
+  delay(millis);
+}
+//Blue and blinking in blue
+void rgbLedBlueAndBlink(unsigned millis)
+{
+  (millis == 0) ? rgbLedBlue() : rgbLedBlueBlink(millis); 
+}
+
+//Cyan
+void rgbLedCyan()
+{
+  digitalWrite(rgbLedRedPin,    LOW);
+  digitalWrite(rgbLedGreenPin, HIGH);
+  digitalWrite(rgbLedBluePin,  HIGH);
+}
+//Blinking in cyan
+void rgbLedCyanBlink(unsigned millis)
+{ 
+  //ON
+  rgbLedCyan();
+  //Halt for given milliseconds
+  delay(millis);
+  //OFF
+  rgbLedOff();
+  //Halt for given milliseconds
+  delay(millis);
+}
+//Cyan and blinking in cyan
+void rgbLedCyanAndBlink(unsigned millis)
+{
+  (millis == 0) ? rgbLedCyan() : rgbLedCyanBlink(millis); 
+}
+
+//Purple
+void rgbLedPurple()
+{
+  digitalWrite(rgbLedRedPin,   HIGH);
+  digitalWrite(rgbLedGreenPin,  LOW);
+  digitalWrite(rgbLedBluePin,  HIGH);
+}
+//Blinking in purple
+void rgbLedPurpleBlink(unsigned millis)
+{ 
+  //ON
+  rgbLedPurple();
+  //Halt for given milliseconds
+  delay(millis);
+  //OFF
+  rgbLedOff();
+  //Halt for given milliseconds
+  delay(millis);
+}
+//Purple and blinking in purple
+void rgbLedPurpleAndBlink(unsigned millis)
+{
+  (millis == 0) ? rgbLedPurple() : rgbLedPurpleBlink(millis); 
+}
+
+//Yellow
+void rgbLedYellow()
+{
+  digitalWrite(rgbLedRedPin,   HIGH);
+  digitalWrite(rgbLedGreenPin, HIGH);
+  digitalWrite(rgbLedBluePin,   LOW);
+}
+//Blinking in yellow
+void rgbLedYellowBlink(unsigned millis)
+{ 
+  //ON
+  rgbLedYellow();
+  //Halt for given milliseconds
+  delay(millis);
+  //OFF
+  rgbLedOff();
+  //Halt for given milliseconds
+  delay(millis);
+}
+//Yellow and blinking in yellow
+void rgbLedYellowAndBlink(unsigned millis)
+{
+  (millis == 0) ? rgbLedYellow() : rgbLedYellowBlink(millis); 
+}
+
+//White
+void rgbLedWhite()
+{
+  digitalWrite(rgbLedRedPin,   HIGH);
+  digitalWrite(rgbLedGreenPin, HIGH);
+  digitalWrite(rgbLedBluePin,  HIGH);
+}
+//Blinking in white
+void rgbLedWhiteBlink(unsigned millis)
+{ 
+  //ON
+  rgbLedWhite();
+  //Halt for given milliseconds
+  delay(millis);
+  //OFF
+  rgbLedOff();
+  //Halt for given milliseconds
+  delay(millis);
+}
+//White and blinking in white
+void rgbLedWhiteAndBlink(unsigned millis)
+{
+  (millis == 0) ? rgbLedWhite() : rgbLedWhiteBlink(millis); 
+} 
+//Blinking in white x1
+void rgbLedWhiteBlinkX01()
+{ 
+  //ON
+  rgbLedWhite();
+  //Halt for given milliseconds
+  delay(1000);
+  //OFF
+  rgbLedOff();
+  //Halt for given milliseconds
+  delay(1000);
+}
+//Blinking in white x2
+void rgbLedWhiteBlinkX02()
+{ 
+  //ON
+  rgbLedWhite();
+  //Halt for given milliseconds
+  delay(500);
+  //OFF
+  rgbLedOff();
+  //Halt for given milliseconds
+  delay(500);
+}
+
+//Off
+void rgbLedOff()
+{
+  digitalWrite(rgbLedRedPin,    LOW);
+  digitalWrite(rgbLedGreenPin,  LOW);
+  digitalWrite(rgbLedBluePin,   LOW);
+}
+
+//All 7 colors
+void rgbLed7Colors(unsigned millis)
+{
+  //Red
+  rgbLedRed();
+  //Serial OUTPUT
+  Serial.println(red);
+  //Halt for given milliseconds
+  delay(millis);
+  //Green
+  rgbLedGreen();
+  //Serial OUTPUT
+  Serial.println(green);
+  //Halt for given milliseconds
+  delay(millis);
+  //Blue
+  rgbLedBlue();
+  //Serial OUTPUT
+  Serial.println(blue);
+  //Halt for given milliseconds
+  delay(millis);
+  //Cyan
+  rgbLedCyan();
+  //Serial OUTPUT
+  Serial.println(cyan);
+  //Halt for given milliseconds
+  delay(millis);
+  //Purple
+  rgbLedPurple();
+  //Serial OUTPUT
+  Serial.println(purple);
+  //Halt for given milliseconds
+  delay(millis);
+  //Yellow
+  rgbLedYellow();
+  //Serial OUTPUT
+  Serial.println(yellow);
+  //Halt for given milliseconds
+  delay(millis);
+  //White
+  rgbLedWhite();
+  //Serial OUTPUT
+  Serial.println(white);
+  //Halt for given milliseconds
+  delay(millis);
+  //Off
+  rgbLedOff();
+  //Serial OUTPUT
+  Serial.println(off);
+  //Halt for given milliseconds
+  delay(millis);
+}
+
+//The only custom function - for setting the LED color and blinking (for version 1.4.0)
+//'R'-red, 'G'-green, 'B'-blue, 'C'-cyan, 'P'-purple, 'Y'-yellow, 'W'-white, 'O'-off, 'A'-all
+void rgbLedClrBlnk(char symbol, unsigned millis)
+{
+  //Blinking in red
+  if (symbol == 'R' && millis > 0) 
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Halt for given milliseconds
+    delay(millis);
+    //OFF
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Halt for given milliseconds
+    delay(millis);
+  }
+  //Red
+  else if (symbol == 'R' && millis == 0)
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+  }
+  //Blinking in green
+  else if (symbol == 'G' && millis > 0) 
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Halt for given milliseconds
+    delay(millis);
+    //OFF
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Halt for given milliseconds
+    delay(millis);
+  }
+  //Green
+  else if (symbol == 'G' && millis == 0)
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,   LOW);
+  }
+  //Blinking in blue
+  else if (symbol == 'B' && millis > 0) 
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,  HIGH);
+    //Halt for given milliseconds
+    delay(millis);
+    //OFF
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Halt for given milliseconds
+    delay(millis);
+  }
+  //Blue
+  else if (symbol == 'B' && millis == 0)
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,  HIGH);
+  }
+  //Blinking in cyan
+  else if (symbol == 'C' && millis > 0)
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,  HIGH);
+    //Halt for given milliseconds
+    delay(millis);
+    //OFF
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Halt for given milliseconds
+    delay(millis);
+  }
+  //Cyan
+  else if (symbol == 'C' && millis == 0)
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,  HIGH);
+  }
+  //Blinking in purple
+  else if (symbol == 'P' && millis > 0)
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,  HIGH);
+    //Halt for given milliseconds
+    delay(millis);
+    //OFF
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Halt for given milliseconds
+    delay(millis);
+  }
+  //Purple
+  else if (symbol == 'P' && millis == 0)
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,  HIGH);
+  }
+  //Blinking in yellow
+  else if (symbol == 'Y' && millis > 0) 
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Halt for given milliseconds
+    delay(millis);
+    //OFF
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Halt for given milliseconds
+    delay(millis);
+  }
+  //Yellow
+  else if (symbol == 'Y' && millis == 0)
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,   LOW);
+  }
+  //Blinking in white
+  else if (symbol == 'W' && millis > 0) 
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,  HIGH);
+    //Halt for given milliseconds
+    delay(millis);
+    //OFF
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Halt for given milliseconds
+    delay(millis);
+  }
+  //White
+  else if (symbol == 'W' && millis == 0)
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,  HIGH);
+  }
+  //All 7 colors (no PWM)
+  else  
+  { 
+    //Red
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Halt for given milliseconds
+    delay(millis);
+    //Green
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Halt for given milliseconds
+    delay(millis);
+    //Blue
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,  HIGH);
+    //Halt for given milliseconds
+    delay(millis);
+    //Cyan
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,  HIGH);
+    //Halt for given milliseconds
+    delay(millis);
+    //Purple
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,  HIGH);
+    //Halt for given milliseconds
+    delay(millis);
+    //Yellow
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Halt for given milliseconds
+    delay(millis);
+    //White
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,  HIGH);
+    //Halt for given milliseconds
+    delay(millis);
+    //Off
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Halt for given milliseconds
+    delay(millis);
+  }
+}
+//The only function ver 2 - with additional serial printing (for version 1.5.0)
+void rgbLedClrBlnkSrl(char symbol, unsigned millis) 
+{
+  //Blinking in red
+  if (symbol == 'R' && millis > 0) 
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Serial printing
+    Serial.print("Sensor reading: ");
+    Serial.print(tempSenVal);
+    Serial.print(" | Temperature: ");
+    Serial.print(tempInCelsius);
+    Serial.print("\xB0\C");
+    Serial.print(" | LED color: ");
+    Serial.println(symbol);
+    //Halt for given milliseconds
+    delay(millis);
+    //OFF
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Serial printing
+    Serial.print("Sensor reading: ");
+    Serial.print(tempSenVal);
+    Serial.print(" | Temperature: ");
+    Serial.print(tempInCelsius);
+    Serial.print("\xB0\C");
+    Serial.print(" | LED color: ");
+    Serial.println('O');
+    //Halt for given milliseconds
+    delay(millis);
+  }
+  //Red
+  else if (symbol == 'R' && millis == 0)
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Serial OUTPUT
+    Serial.print("Sensor reading: ");
+    Serial.print(tempSenVal);
+    Serial.print(" | Temperature: ");
+    Serial.print(tempInCelsius);
+    Serial.print("\xB0\C");
+    Serial.print(" | LED color: ");
+    Serial.println(symbol);
+  }
+  //Blinking in green
+  else if (symbol == 'G' && millis > 0) 
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Serial OUTPUT
+    Serial.print("Sensor reading: ");
+    Serial.print(tempSenVal);
+    Serial.print(" | Temperature: ");
+    Serial.print(tempInCelsius);
+    Serial.print("\xB0\C");
+    Serial.print(" | LED color: ");
+    Serial.println(symbol);
+    //Halt for given milliseconds
+    delay(millis);
+    //OFF
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Serial OUTPUT
+    Serial.print("Sensor reading: ");
+    Serial.print(tempSenVal);
+    Serial.print(" | Temperature: ");
+    Serial.print(tempInCelsius);
+    Serial.print("\xB0\C");
+    Serial.print(" | LED color: ");
+    Serial.println('O');
+    //Halt for given milliseconds
+    delay(millis);
+  }
+  //Green
+  else if (symbol == 'G' && millis == 0)
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Serial OUTPUT
+    Serial.print("Sensor reading: ");
+    Serial.print(tempSenVal);
+    Serial.print(" | Temperature: ");
+    Serial.print(tempInCelsius);
+    Serial.print("\xB0\C");
+    Serial.print(" | LED color: ");
+    Serial.println(symbol);
+  }
+  //Blinking in blue
+  else if (symbol == 'B' && millis > 0) 
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,  HIGH);
+    //Serial OUTPUT
+    Serial.print("Sensor reading: ");
+    Serial.print(tempSenVal);
+    Serial.print(" | Temperature: ");
+    Serial.print(tempInCelsius);
+    Serial.print("\xB0\C");
+    Serial.print(" | LED color: ");
+    Serial.println(symbol);
+    //Halt for given milliseconds
+    delay(millis);
+    //OFF
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Serial OUTPUT
+    Serial.print("Sensor reading: ");
+    Serial.print(tempSenVal);
+    Serial.print(" | Temperature: ");
+    Serial.print(tempInCelsius);
+    Serial.print("\xB0\C");
+    Serial.print(" | LED color: ");
+    Serial.println('O');
+    //Halt for given milliseconds
+    delay(millis);
+  }
+  //Blue
+  else if (symbol == 'B' && millis == 0)
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,  HIGH);
+    //Serial OUTPUT
+    Serial.print("Sensor reading: ");
+    Serial.print(tempSenVal);
+    Serial.print(" | Temperature: ");
+    Serial.print(tempInCelsius);
+    Serial.print("\xB0\C");
+    Serial.print(" | LED color: ");
+    Serial.println(symbol);
+  }
+  //Blinking in cyan
+  else if (symbol == 'C' && millis > 0)
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,  HIGH);
+    //Serial OUTPUT
+    Serial.print("Sensor reading: ");
+    Serial.print(tempSenVal);
+    Serial.print(" | Temperature: ");
+    Serial.print(tempInCelsius);
+    Serial.print("\xB0\C");
+    Serial.print(" | LED color: ");
+    Serial.println(symbol);
+    //Halt for given milliseconds
+    delay(millis);
+    //OFF
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Serial OUTPUT
+    Serial.print("Sensor reading: ");
+    Serial.print(tempSenVal);
+    Serial.print(" | Temperature: ");
+    Serial.print(tempInCelsius);
+    Serial.print("\xB0\C");
+    Serial.print(" | LED color: ");
+    Serial.println('O');
+    //Halt for given milliseconds
+    delay(millis);
+  }
+  //Cyan
+  else if (symbol == 'C' && millis == 0)
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,  HIGH);
+    //Serial OUTPUT
+    Serial.print("Sensor reading: ");
+    Serial.print(tempSenVal);
+    Serial.print(" | Temperature: ");
+    Serial.print(tempInCelsius);
+    Serial.print("\xB0\C");
+    Serial.print(" | LED color: ");
+    Serial.println(symbol);
+  }
+  //Blinking in purple
+  else if (symbol == 'P' && millis > 0)
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,  HIGH);
+    //Serial OUTPUT
+    Serial.print("Sensor reading: ");
+    Serial.print(tempSenVal);
+    Serial.print(" | Temperature: ");
+    Serial.print(tempInCelsius);
+    Serial.print("\xB0\C");
+    Serial.print(" | LED color: ");
+    Serial.println(symbol);
+    //Halt for given milliseconds
+    delay(millis);
+    //OFF
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Serial OUTPUT
+    Serial.print("Sensor reading: ");
+    Serial.print(tempSenVal);
+    Serial.print(" | Temperature: ");
+    Serial.print(tempInCelsius);
+    Serial.print("\xB0\C");
+    Serial.print(" | LED color: ");
+    Serial.println('O');
+    //Halt for given milliseconds
+    delay(millis);
+  }
+  //Purple
+  else if (symbol == 'P' && millis == 0)
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,  HIGH);
+    Serial.print("Sensor reading: ");
+    Serial.print(tempSenVal);
+    Serial.print(" | Temperature: ");
+    Serial.print(tempInCelsius);
+    Serial.print("\xB0\C");
+    Serial.print(" | LED color: ");
+    Serial.println(symbol);
+  }
+  //Blinking in yellow
+  else if (symbol == 'Y' && millis > 0) 
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Serial OUTPUT
+    Serial.print("Sensor reading: ");
+    Serial.print(tempSenVal);
+    Serial.print(" | Temperature: ");
+    Serial.print(tempInCelsius);
+    Serial.print("\xB0\C");
+    Serial.print(" | LED color: ");
+    Serial.println(symbol);
+    //Halt for given milliseconds
+    delay(millis);
+    //OFF
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Serial OUTPUT
+    Serial.print("Sensor reading: ");
+    Serial.print(tempSenVal);
+    Serial.print(" | Temperature: ");
+    Serial.print(tempInCelsius);
+    Serial.print("\xB0\C");
+    Serial.print(" | LED color: ");
+    Serial.println('O');
+    //Halt for given milliseconds
+    delay(millis);
+  }
+  //Yellow
+  else if (symbol == 'Y' && millis == 0)
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Serial OUTPUT
+    Serial.print("Sensor reading: ");
+    Serial.print(tempSenVal);
+    Serial.print(" | Temperature: ");
+    Serial.print(tempInCelsius);
+    Serial.print("\xB0\C");
+    Serial.print(" | LED color: ");
+    Serial.println(symbol);
+  }
+  //Blinking in white
+  else if (symbol == 'W' && millis > 0) 
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,  HIGH);
+    //Serial OUTPUT
+    Serial.print("Sensor reading: ");
+    Serial.print(tempSenVal);
+    Serial.print(" | Temperature: ");
+    Serial.print(tempInCelsius);
+    Serial.print("\xB0\C");
+    Serial.print(" | LED color: ");
+    Serial.println(symbol);
+    //Halt for given milliseconds
+    delay(millis);
+    //OFF
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Serial OUTPUT
+    Serial.print("Sensor reading: ");
+    Serial.print(tempSenVal);
+    Serial.print(" | Temperature: ");
+    Serial.print(tempInCelsius);
+    Serial.print("\xB0\C");
+    Serial.print(" | LED color: ");
+    Serial.println('O');
+    //Halt for given milliseconds
+    delay(millis);
+  }
+  //White
+  else if (symbol == 'W' && millis == 0)
+  {
+    //ON
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,  HIGH);
+    //Serial OUTPUT
+    Serial.print("Sensor reading: ");
+    Serial.print(tempSenVal);
+    Serial.print(" | Temperature: ");
+    Serial.print(tempInCelsius);
+    Serial.print("\xB0\C");
+    Serial.print(" | LED color: ");
+    Serial.println(symbol);
+  }
+  //All 7 colors (no PWM)
+  else  
+  { 
+    //Red
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Serial OUTPUT
+    Serial.println(red);
+    //Halt for given milliseconds
+    delay(millis);
+    //Green
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Serial OUTPUT
+    Serial.println(green);
+    //Halt for given milliseconds
+    delay(millis);
+    //Blue
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,  HIGH);
+    //Serial OUTPUT
+    Serial.println(blue);
+    //Halt for given milliseconds
+    delay(millis);
+    //Cyan
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,  HIGH);
+    //Serial OUTPUT
+    Serial.println(cyan);
+    //Halt for given milliseconds
+    delay(millis);
+    //Purple
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,  HIGH);
+    //Serial OUTPUT
+    Serial.println(purple);
+    //Halt for given milliseconds
+    delay(millis);
+    //Yellow
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Serial OUTPUT
+    Serial.println(yellow);
+    //Halt for given milliseconds
+    delay(millis);
+    //White
+    digitalWrite(rgbLedRedPin,   HIGH);
+    digitalWrite(rgbLedGreenPin, HIGH);
+    digitalWrite(rgbLedBluePin,  HIGH);
+    //Serial OUTPUT
+    Serial.println(white);
+    //Halt for given milliseconds
+    delay(millis);
+    //Off
+    digitalWrite(rgbLedRedPin,    LOW);
+    digitalWrite(rgbLedGreenPin,  LOW);
+    digitalWrite(rgbLedBluePin,   LOW);
+    //Serial OUTPUT
+    Serial.println(off);
+    //Halt for given milliseconds
+    delay(millis);
+  }
+}
+
+//Universal function for setting the color, blinking and serial printing (for version 1.5.1)
+void rgbLedColorBlinkSerial(String color, unsigned millis) 
+{
+  //Blinking in red
+  if (color == red && millis > 0) 
+  {
+    //ON
+    rgbLedRed();
+    //Serial OUTPUT
+    printToSerial(color);
+    //Halt for given milliseconds
+    delay(millis);
+    //OFF
+    rgbLedOff();
+    printToSerial(off);
+    //Halt for given milliseconds
+    delay(millis);
+  }
+  //Red
+  else if (color == red && millis == 0)
+  {
+    //ON
+    rgbLedRed();
+    //Serial OUTPUT
+    printToSerial(color);
+  }
+  //Blinking in green
+  else if (color == green && millis > 0) 
+  {
+    //ON
+    rgbLedGreen();
+    //Serial OUTPUT
+    printToSerial(color);
+    //Halt for given milliseconds
+    delay(millis);
+    //OFF
+    rgbLedOff();
+    //Serial OUTPUT
+    printToSerial(off);
+    //Halt for given milliseconds
+    delay(millis);
+  }
+  //Green
+  else if (color == green && millis == 0)
+  {
+    rgbLedGreen();
+    //Serial OUTPUT
+    printToSerial(color);
+  }
+  //Blinking in blue
+  else if (color == blue && millis > 0) 
+  {
+    //ON
+    rgbLedBlue();
+    //Serial OUTPUT
+    printToSerial(color);
+    //Halt for given milliseconds
+    delay(millis);
+    //OFF
+    rgbLedOff();
+    //Serial OUTPUT
+    printToSerial(off);
+    //Halt for given milliseconds
+    delay(millis);
+  }
+  //Blue
+  else if (color == blue && millis == 0)
+  {
+    //ON
+    rgbLedBlue();
+    //Serial OUTPUT
+    printToSerial(color);
+  }
+  //Blinking in cyan
+  else if (color == cyan && millis > 0) 
+  {
+    //ON
+    rgbLedCyan();
+    //Serial OUTPUT
+    printToSerial(color);
+    //Halt for given milliseconds
+    delay(millis);
+    //OFF
+    rgbLedOff();
+    //Serial OUTPUT
+    printToSerial(off);
+    //Halt for given milliseconds
+    delay(millis);
+  }
+  //Cyan
+  else if (color == cyan && millis == 0)
+  {
+    //ON
+    rgbLedCyan();
+    //Serial OUTPUT
+    printToSerial(color);
+  }
+  //Blinking in purple
+  else if (color == purple && millis > 0) 
+  {
+    //ON
+    rgbLedPurple();
+    //Serial OUTPUT
+    printToSerial(color);
+    //Halt for given milliseconds
+    delay(millis);
+    //OFF
+    rgbLedOff();
+    //Serial OUTPUT
+    printToSerial(off);
+    //Halt for given milliseconds
+    delay(millis);
+  }
+  //Purple
+  else if (color == purple && millis == 0)
+  {
+    //ON
+    rgbLedPurple();
+    printToSerial(color);
+  }
+  //Blinking in yellow
+  else if (color == yellow && millis > 0) 
+  {
+    //ON
+    rgbLedYellow();
+    //Serial OUTPUT
+    printToSerial(color);
+    //Halt for given milliseconds
+    delay(millis);
+    //OFF
+    rgbLedOff();
+    //Serial OUTPUT
+    printToSerial(off);
+    //Halt for given milliseconds
+    delay(millis);
+  }
+  //Yellow
+  else if (color == yellow && millis == 0)
+  {
+    //ON
+    rgbLedYellow();
+    //Serial OUTPUT
+    printToSerial(color);
+  }
+  //Blinking in white
+  else if (color == white && millis > 0) 
+  {
+    //ON
+    rgbLedWhite();
+    //Serial OUTPUT
+    printToSerial(color);
+    //Halt for given milliseconds
+    delay(millis);
+    //OFF
+    rgbLedOff();
+    //Serial OUTPUT
+    printToSerial(off);
+    //Halt for given milliseconds
+    delay(millis);
+  }
+  //White
+  else if (color == white && millis == 0)
+  {
+    //ON
+    rgbLedWhite();
+    //Serial OUTPUT
+    printToSerial(color);
+  }
+  //All 7 colors with given delay
+  else
+  { 
+    rgbLed7Colors(millis);
+  }
+}

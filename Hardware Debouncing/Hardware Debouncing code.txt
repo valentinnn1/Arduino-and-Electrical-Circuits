@@ -1,0 +1,64 @@
+// constants won't change. They're used here to
+// set pin numbers:
+const int buttonPin = 12,  // the number of the pushbutton pin
+             ledPin = 13;  // the number of the LED pin
+
+// Variables will change:
+byte       ledState = true; // the current state of the LED
+int currButtonState =  LOW, // the current reading from the input pin
+    prevButtonState =  LOW, // the previous reading from the input pin
+      buttonCounter =    0, 
+        loopCounter =    0;
+                 
+void setup() 
+{
+  pinMode(buttonPin,  INPUT);
+  pinMode   (ledPin, OUTPUT);
+  // initialize serial comm
+  Serial.begin(115200);
+  // set initial LED state
+  digitalWrite(ledPin, ledState);
+  delay(10);
+}
+
+void loop() 
+{
+  currButtonState = digitalRead(buttonPin);
+  
+  if (currButtonState != prevButtonState) 
+    {
+      // increment the button counter by RISING edge
+      // or positive edge: low-to-high transition
+      if (currButtonState == HIGH) 
+      { 
+        buttonCounter++;
+      }
+      // only toggle the LED if the new button state is 
+      // LOW again - after the FALLING Edge
+      else
+      {
+        ledState = !ledState;
+      }
+    }
+
+  // set the LED:
+  digitalWrite(ledPin, ledState ? HIGH : LOW);
+
+  // save the reading.  Next time through the loop,
+  // it will ll be the lastButtonState:
+  prevButtonState = currButtonState;
+  
+  Serial.print("LC:"); // Loop Counter
+  Serial.print(++loopCounter);
+  Serial.print(" | ");
+  Serial.print("BS:"); // Button State
+  Serial.print(currButtonState ? "DOWN" : " UP ");
+  Serial.print(" | ");
+  Serial.print("BC:"); // Button Counter
+  Serial.print(buttonCounter);
+  Serial.print(" | ");
+  Serial.print("LED:");
+  Serial.println(ledState == true ? " ON" : "OFF");
+
+  delay(50); // Only to accelerate simulation time
+}
